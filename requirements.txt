@@ -1,0 +1,12 @@
+pandas
+pdf2image
+PyPDF2
+pytesseract
+tqdm
+sqlalchemy
+pdfminer.six
+vsdx
+extract-msg
+typer
+openpyxl
+boto3
