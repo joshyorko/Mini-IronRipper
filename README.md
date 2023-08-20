@@ -1,6 +1,6 @@
 # dw-tesseract-ocr
 
-The `dw-tesseract-ocr` project is a Python-based application that uses both the `pdfminer` library and Optical Character Recognition (OCR) to process documents, extract text, and store the results in a SQLite database. It's primarily designed to handle PDF, MSG, Excel, and CSV files. It can also process Word documents by converting them into PDF format first. Additionally, this application supports the conversion of image files into PDF and extraction of text from those files.
+The `dw-tesseract-ocr` project is a Python-based application that uses Optical Character Recognition (OCR) to process documents, extract text, and store the results in a SQLite database. It's primarily designed to handle PDF and MSG files but can also process Word documents by converting them into PDF format first. Additionally, this application supports the conversion of image files into PDF and extraction of text from those files.
 
 ## Table of Contents
 
@@ -45,11 +45,11 @@ Once the image is built, you can create and run a Docker container from it using
 docker run -it --name ocr_container dw-tesseract-ocr:latest
 ```
 
-You can then interact with the application inside the container's shell. The application will prompt you to input the directory path containing the documents to be processed, the question you'd like to ask, and the number of threads you'd like to use.
+You can then interact with the application inside the container's shell. The application will prompt you to input the directory path containing the documents to be processed and the question you'd like to ask.
 
 ## Application Scripts
 
-The application consists of several Python scripts to perform various tasks. It also uses multithreading to process files and is designed to be run as a CLI application:
+The application consists of several Python scripts to perform various tasks:
 
 - `pdf_ocr.py`: The main application script that performs OCR on the documents.
 - `utils/convert_word_docs.py`: A utility script to convert Word documents to PDF format.
@@ -77,7 +77,7 @@ These dependencies are listed in the `requirements.txt` file and will be install
 
 ## Output
 
-The output will be a SQLite database named `pdf_data.db` containing the data extracted from the documents and a CSV file named based on the directory name. The extracted text from the documents is also written to a text file named `extracted_text.txt`. Additionally, the extracted text from the documents is also written to a text file named `extracted_text.txt`.
+The output will be a SQLite database named `pdf_data.db` containing the data extracted from the documents and a CSV file named `output_indexed.csv`. Additionally, the extracted text from the documents is also written to a text file named `extracted_text.txt`.
 
 ## Usage
 
@@ -89,7 +89,9 @@ To use this application:
 4. Run the Docker container.
 5. When prompted, input the directory path containing the documents to be processed and the question you'd like to ask.
 
-Supported document types include `.pdf`, `.doc`, `.docx`, `.msg`, `.xlsx`, `.csv`, and image files in `.png`, `.jpg`, and `.jpeg` formats.
+Supported document types include `.pdf`, `.doc
+
+`, `.docx`, `.msg`, and image files in `.png`, `.jpg`, and `.jpeg` formats.
 
 ## Dockerfile
 
