@@ -1,0 +1,11 @@
+/env
+/gain_ocr
+/venv
+results.csv
+extracted_text.txt
+sample_pdfs/pds
+__pycache__/
+extracted_text.txt
+pdf_data.db
+output.csv
+pdf_processing.log
