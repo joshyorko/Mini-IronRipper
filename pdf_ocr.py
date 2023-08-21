@@ -26,7 +26,7 @@ logging.basicConfig(filename='pdf_processing.log', level=logging.INFO,
 @app.command()
 def main(
     dir_path: str = typer.Option(..., prompt="The path to the directory containing the files to be processed."),
-    question: str = typer.Option(..., prompt="The question to ask."),
+    question: str = typer.Option('test', prompt="The question to ask."),
     thread_count: int = typer.Option(3, prompt="The number of threads to use."),
 ):
 
@@ -68,7 +68,7 @@ def main(
     # Reset index of the dataframe for easier manipulation
     df = df.reset_index(drop=True)
 
-    return ut.write_extracted_text_to_file(EXTRACTED_TEXT_FILE_NAME, df, intro_text, extracted_text, outro_text)
+    return ut.write_extracted_text_to_file(EXTRACTED_TEXT_FILE_NAME, extracted_text)
 
 if __name__ == "__main__":
     app()

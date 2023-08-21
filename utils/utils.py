@@ -18,7 +18,8 @@ from pdfminer.pdfparser import PDFParser
 from PyPDF2 import PdfReader
 
 import subprocess
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter
+
 import os
 from concurrent.futures import ThreadPoolExecutor
 
@@ -123,7 +124,7 @@ def ocr_to_text(pdf_path, inner_thread_count=2):  # Set a reasonable default
     text = ""
     try:
         # Convert each page in the PDF to an image
-        images = convert_from_path(pdf_path, dpi=300)
+        images = convert_from_path(pdf_path, dpi=450)
         
         # Function to process a single image
         def process_image(image):
@@ -238,9 +239,14 @@ def get_files(path: str) -> List[str]:
         raise ValueError("Input path is not a file or directory.")
 # The main function to process files, store results and answer questions
 
+def write_extracted_text_to_file(EXTRACTED_TEXT_FILE_NAME, extracted_text):
+    with open(EXTRACTED_TEXT_FILE_NAME, 'w') as f:
+        # Write each document's text to the output file
+        for idx, item in enumerate(extracted_text):
+            # Write the text of the document
+            f.write("%s\n" % item)
 
-
-def write_extracted_text_to_file(EXTRACTED_TEXT_FILE_NAME, df, intro_text, extracted_text, outro_text):
+def write_extracted_text_to_file_anthropic(EXTRACTED_TEXT_FILE_NAME, df, intro_text, extracted_text, outro_text):
      with open(EXTRACTED_TEXT_FILE_NAME, 'w') as f:
          # Write the introductory text to the output file
          f.write(intro_text + "\n")
