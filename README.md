@@ -3,9 +3,7 @@
 # Mini-IronRipper
 
 
-<div style="text-align:center">
-  <img src="utils/logo.png" alt="Logo" width="50%">
-</div>
+![Logo](utils/logo.png)
 
 
 Mini-IronRipper is a Python application for extracting text and metadata from PDFs, Word docs, Excel files, CSVs, images, and emails. It uses OCR for handling scanned documents and images.
