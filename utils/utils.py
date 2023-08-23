@@ -18,7 +18,7 @@ from pdfminer.pdfparser import PDFParser
 from PyPDF2 import PdfReader
 
 import subprocess
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image
 
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -84,6 +84,7 @@ def get_info(pdf_path):
             pdf = PdfReader(f)
             info = pdf.metadata
             pdf = PdfReader(pdf_path)
+            logging.info(f'Extracted Metadata from PDF: {pdf_path}')
     except Exception as e:
         logging.error(f"Failed to extract metadata from {pdf_path}: {e}")
         info = {}
@@ -124,7 +125,7 @@ def ocr_to_text(pdf_path, inner_thread_count=2):  # Set a reasonable default
     text = ""
     try:
         # Convert each page in the PDF to an image
-        images = convert_from_path(pdf_path, dpi=450)
+        images = convert_from_path(pdf_path, dpi=300)
         
         # Function to process a single image
         def process_image(image):
@@ -152,6 +153,7 @@ def pdf_to_text(pdf_path):
     text = pdfminer_to_text(pdf_path)
     # Extract text from images using OCR
     text += ocr_to_text(pdf_path)
+    logging.info(f'Extracted Text from PDF: {pdf_path}')
     return text
 
 # Function to extract metadata and text from an```python
@@ -179,6 +181,11 @@ def process_file(file_path: str) -> Tuple[Dict, str, str]:
         logging.info(f'Word Doc Detected...Converting to PDF.... {file_path}')
         convert_doc_to_pdf(file_path)
         pdf_file_path = file_path.replace('.docx', '.pdf')
+        info, text = process_pdf(pdf_file_path)
+    elif file_path.endswith('.pptx'):
+        logging.info(f'Powerpoint Doc Detected...Converting to PDF.... {file_path}')
+        convert_doc_to_pdf(file_path)
+        pdf_file_path = file_path.replace('.pptx', '.pdf')
         info, text = process_pdf(pdf_file_path)
     elif file_path.endswith('.msg'):
         # If the file is an MSG file, process it directly
@@ -224,6 +231,7 @@ def process_pdf(pdf_path):
     info = get_info(pdf_path)
     # Extract text from the PDF
     text = pdf_to_text(pdf_path)
+    logging.info(f'Extracted Text from PDF: {pdf_path}')
     return info, text
 
 # Function to get all PDF, DOCX, TXT, XLSX, CSV and MSG files in a directory

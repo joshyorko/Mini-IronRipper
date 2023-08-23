@@ -15,7 +15,7 @@ app = typer.Typer()
 
 # Define global path variables
 TESSERACT_PATH = '/usr/bin/tesseract'
-RESULTS_FILE_NAME = 'output_indexed.csv'
+RESULTS_FILE_NAME = '_output_indexed.csv'
 EXTRACTED_TEXT_FILE_NAME = 'extracted_text.txt'
 
 # Configure logging
@@ -55,7 +55,7 @@ def main(
     df.columns = df.columns.str.replace('Metadata.', '').str.replace('/', '')
     df['extracted_text'] = df['extracted_text'].str.replace('\n', ' ')
     # Get the directory name and use it as the output CSV file name
-    results_file_name = os.path.basename(os.path.normpath(dir_path)) + '.csv'
+    results_file_name = os.path.basename(os.path.normpath(dir_path)) + RESULTS_FILE_NAME
     # Save results to a CSV file
     df.to_csv(results_file_name, index=False, sep=',', escapechar='\\')
     # Extract all text and prepare the data for further processing
@@ -68,7 +68,8 @@ def main(
     # Reset index of the dataframe for easier manipulation
     df = df.reset_index(drop=True)
 
-    return ut.write_extracted_text_to_file(EXTRACTED_TEXT_FILE_NAME, extracted_text)
+    logging
+    return ut.write_extracted_text_to_file_anthropic(EXTRACTED_TEXT_FILE_NAME, df, intro_text, extracted_text, outro_text)
 
 if __name__ == "__main__":
     app()
