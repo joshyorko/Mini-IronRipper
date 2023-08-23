@@ -10,10 +10,10 @@ RUN apt-get update && \
 RUN python3 -m pip install --upgrade pip && \
     pip install wheel
 
-# Copy the requirements.txt and pdf_ocr.py files
+# Copy the requirements.txt and mini-iron-ripper.py files
 COPY requirements.txt /app/requirements.txt
-COPY pdf_ocr.py /app/pdf_ocr.py
-COPY sample_pdfs /app/sample_pdfs
+COPY mini-iron-ripper.py /app/mini-iron-ripper.py
+
 COPY utils /app/utils
 
 # Set the working directory
