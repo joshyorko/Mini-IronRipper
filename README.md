@@ -73,4 +73,3 @@ Mini-IronRipper was created by [Josh Yorko](https://github.com/joshyorko) It use
 - [OpenPyXL](https://openpyxl.readthedocs.io/en/stable/) for Excel files
 - [extract_msg](https://github.com/mattgwwalker/msg-extractor) for Outlook MSG files
 
-Let me know if you would like me to explain or expand on any part of this README!
