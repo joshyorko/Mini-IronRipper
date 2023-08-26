@@ -1,5 +1,5 @@
-# Use the official Ubuntu base image
-FROM ubuntu:latest
+# Use python as the base image
+FROM python:3.10.8-slim-buster
 
 # Update the package list and install dependencies
 RUN apt-get update && \

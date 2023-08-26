@@ -1,6 +1,7 @@
 name: Lint Code and Dockerfiles
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main  # adjust this if your default branch is named differently
