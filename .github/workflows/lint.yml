@@ -1,0 +1,31 @@
+name: Lint Code and Dockerfiles
+
+on:
+  pull_request:
+    branches:
+      - main  # adjust this if your default branch is named differently
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Lint Python code
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Python Dependencies
+        run: pip install flake8
+
+      - name: Lint Python with flake8
+        run: flake8 .
+
+      # Lint Dockerfile
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v1.5.0
+        with:
+          dockerfile: Dockerfile  # Replace this with your Dockerfile path if different
