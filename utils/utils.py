@@ -15,7 +15,7 @@ from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 
 import subprocess
 from PIL import Image
