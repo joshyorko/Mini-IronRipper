@@ -1,36 +1,23 @@
-name: Merge Dependabot PRs
+name: Lint Code and Dockerfiles
 
 on:
-  pull_request_target:
+  workflow_dispatch:
+  pull_request:
     branches:
-      - main
-    types:
-      - opened
-      - synchronize
+      - main  # adjust this if your default branch is named differently
 
 jobs:
-  check-lint-status:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Check lint job status
-        id: check-status
-        run: |
-          # Use GitHub API to check the status of your lint job
-          # This is just a pseudo-code snippet; you'll need to implement this in a way that matches your actual setup
-          LINT_STATUS=$(curl -H "Authorization: token ${{secrets.GITHUB_TOKEN}}" https://api.github.com/repos/your-repo/actions/runs?event=pull_request | jq '.workflow_runs[] | select(.name=="Lint Code and Dockerfiles") | .conclusion')
-          if [[ $LINT_STATUS == "success" ]]; then
-            echo "Lint job successful. Proceeding with merge."
-          else
-            echo "Lint job failed. Exiting."
-            exit 1
-          fi
-          
-  merge-me:
-    needs: check-lint-status
-    runs-on: ubuntu-latest
-    steps:
-      - name: Merge me!
-        uses: ridedott/merge-me-action@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Lint Python code
+     
+
+      # Lint Dockerfile
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v1.5.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PRESET: DEPENDABOT_PATCH
+          dockerfile: Dockerfile  # Replace this with your Dockerfile path if different
