@@ -5,18 +5,19 @@ FROM python:3.10.8-slim-buster
 # Note: apt-get doesn't support '>=', so it'll always install the latest version available
 RUN apt-get update && \
     apt-get install -y \
-    python3 \
-    python3-pip \
-    libreoffice \
-    tesseract-ocr \
-    libtesseract-dev \
-    build-essential \
-    poppler-utils \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
+    python3=3.7.3-1 \
+    python3-pip=18.1-5 \
+    libreoffice=1:6.1.5-3 \
+    tesseract-ocr=4.00~git2288-10f4998a-2 \
+    libtesseract-dev=4.00~git2288-10f4998a-2 \
+    build-essential=12.6 \
+    poppler-utils=0.71.0-5 \
+    libsm6=2:1.2.3-1 \
+    libxext6=2:1.3.3-1+b2 \
+    libxrender-dev=1:0.9.10-1 \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
+
 
 # Upgrade pip and install wheel
 # For pip, you can specify version like pip>=21.0
