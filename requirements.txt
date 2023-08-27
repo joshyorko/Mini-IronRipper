@@ -30,7 +30,7 @@ pdf2image==1.16.3
 pdfminer.six==20221105
 Pillow==10.0.0
 pycparser==2.21
-pyparsing==2.4.7
+pyparsing==3.1.1
 PyPDF2==3.0.1
 pytesseract==0.3.10
 python-dateutil==2.8.2
