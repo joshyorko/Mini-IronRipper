@@ -13,6 +13,9 @@ import pandas as pd
 import pytesseract
 import typer
 from utils import utils as ut
+from rich.logging import RichHandler
+from rich import print
+import logging
 
 
 # Initialize Typer for CLI making
@@ -23,20 +26,22 @@ TESSERACT_PATH = "/usr/bin/tesseract"
 RESULTS_FILE_NAME = "_output_indexed.csv"
 EXTRACTED_TEXT_FILE_NAME = "extracted_text.txt"
 
-# Configure logging
+# Configure Rich for better logging
 logging.basicConfig(
-    filename="pdf_processing.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
+    level="INFO",
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler()]
 )
 
+logger = logging.getLogger("rich")
 
-@app.command()
+@app.command(help="This command processes PDF files in a given directory using multithreading and extracts text from them using Tesseract OCR.")
 def main(
-    
-    dir_path: str = typer.Option(..., prompt="The path to the directory containing the files to be processed."),
-    question: str = typer.Option("test", prompt="The question to ask."),
-    thread_count: int = typer.Option(3, prompt="The number of threads to use.")):
+    dir_path: str = typer.Option(..., prompt="The path to the directory containing the files to be processed.", help="The path to the directory containing the PDF files to be processed."),
+    question: str = typer.Option("test", prompt="The question to ask.", help="The question that will be asked after processing the documents."),
+    thread_count: int = typer.Option(3, prompt="The number of threads to use.", help="The number of threads to use for processing the files.", min=1)
+):
 
     """
     Processes PDF files in a given directory using multithreading and extracts text from them using Tesseract OCR.
@@ -91,8 +96,8 @@ def main(
     # Reset index of the dataframe for easier manipulation
     df = df.reset_index(drop=True)
 
-    logging
-    return ut.write_extracted_text_to_file(EXTRACTED_TEXT_FILE_NAME, extracted_text)
+    
+    return ut.write_extracted_text_to_file_anthropic(EXTRACTED_TEXT_FILE_NAME, df,intro_text,extracted_text,outro_text)
 
 
 if __name__ == "__main__":

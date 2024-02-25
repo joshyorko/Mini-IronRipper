@@ -1,6 +1,6 @@
 /env
 /gain_ocr
-/venv
+/.venv
 results.csv
 extracted_text.txt
 sample_pdfs/pds

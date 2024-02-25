@@ -1,9 +1,10 @@
 # Import necessary libraries for pdf processing, image processing, text extraction, threading, type checking and cli-making
 import logging
-
+import os
+from concurrent.futures import ThreadPoolExecutor
 from io import StringIO
 from typing import Dict, List, Tuple
-
+import subprocess
 import pandas as pd
 import pytesseract
 from extract_msg import Message  # Library to handle .msg files
@@ -16,16 +17,10 @@ from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
 from pypdf import PdfReader
-
-import subprocess
 from PIL import Image
 
-import os
-from concurrent.futures import ThreadPoolExecutor
 
 
-import os
-from PIL import Image
 
 
 def convert_image_to_pdf(image_file):
@@ -54,8 +49,7 @@ def convert_image_to_pdf(image_file):
             print(f"{pdf_file} already exists")
 
 
-import os
-import subprocess
+
 
 
 def convert_doc_to_pdf(doc_file):
@@ -81,9 +75,6 @@ def convert_doc_to_pdf(doc_file):
         ]
     )
     return
-
-
-from openpyxl import load_workbook
 
 
 def get_excel_metadata(filepath):
@@ -148,9 +139,12 @@ def get_info(pdf_path):
             pdf = PdfReader(f)
             info = pdf.metadata
             pdf = PdfReader(pdf_path)
-            logging.info(f"Extracted Metadata from PDF: {pdf_path}")
-    except Exception as e:
-        logging.error(f"Failed to extract metadata from {pdf_path}: {e}")
+            logging.info("Extracted Metadata from PDF: %s", pdf_path)
+    except FileNotFoundError as e:
+        logging.error("Failed to extract metadata from %s: %s", pdf_path, e)
+        info = {}
+    except IOError as e:
+        logging.error("Failed to extract metadata from %s: %s", pdf_path, e)
         info = {}
     return info
 
@@ -261,7 +255,7 @@ def pdf_to_text(pdf_path):
     text = pdfminer_to_text(pdf_path)
     # Extract text from images using OCR
     text += ocr_to_text(pdf_path)
-    logging.info(f"Extracted Text from PDF: {pdf_path}")
+    logging.info("Extracted Text from PDF: %s", pdf_path)
     return text
 
 
@@ -289,67 +283,42 @@ def process_msg(msg_path):
 
 
 def process_file(file_path: str) -> Tuple[Dict, str, str]:
-    """
-    This function takes a file path as input and processes the file based on its extension.
-    Supported file types are PDF, Word documents, Powerpoint documents, MSG files, images, Excel files and CSV files.
-    For PDF, Word documents, Powerpoint documents and MSG files, the function extracts text from the file.
-    For images, the function uses OCR to extract text from the image.
-    For Excel and CSV files, the function reads the file into a pandas DataFrame and converts it to a string.
-    The function returns a tuple containing the metadata of the file, the extracted text and the file path.
+    def convert_and_process_pdf(original_file_path: str, target_extension: str):
+        logging.info("Converting to PDF.... %s", original_file_path)
+        convert_doc_to_pdf(original_file_path)
+        pdf_file_path = original_file_path.replace(target_extension, ".pdf")
+        return process_pdf(pdf_file_path)
 
-    Args:
-    - file_path (str): The path of the file to be processed.
-
-    Returns:
-    - Tuple[Dict, str, str]: A tuple containing the metadata of the file, the extracted text and the file path.
-    """
     if file_path.endswith(".pdf"):
-        # If the file is a PDF, process it directly
         info, text = process_pdf(file_path)
     elif file_path.endswith(".docx"):
-        # If the file is a Word document, convert it to PDF and then process it
-        logging.info(f"Word Doc Detected...Converting to PDF.... {file_path}")
-        convert_doc_to_pdf(file_path)
-        pdf_file_path = file_path.replace(".docx", ".pdf")
-        info, text = process_pdf(pdf_file_path)
+        info, text = convert_and_process_pdf(file_path, ".docx")
     elif file_path.endswith(".pptx"):
-        logging.info(f"Powerpoint Doc Detected...Converting to PDF.... {file_path}")
-        convert_doc_to_pdf(file_path)
-        pdf_file_path = file_path.replace(".pptx", ".pdf")
-        info, text = process_pdf(pdf_file_path)
+        info, text = convert_and_process_pdf(file_path, ".pptx")
     elif file_path.endswith(".msg"):
-        # If the file is an MSG file, process it directly
-        logging.info(f"MSG File Detected...Extracting Text.... {file_path}")
+        logging.info("MSG File Detected...Extracting Text.... %s", file_path)
         info, text = process_msg(file_path)
     elif file_path.endswith((".png", ".jpeg", ".jpg")):
-        logging.info(f"Image File Detected...Extracting Text.... {file_path}")
+        logging.info(f"Image File Detected....Extracting Text.... %s", file_path)
         image = Image.open(file_path)
-        info = {}  # Set the metadata to an empty dictionary for images
-        text = ocr_from_image(image)  # Call your OCR function here
+        info = {}
+        text = ocr_from_image(image)
     elif file_path.endswith((".xlsx", ".csv")):
-        # If the file is an Excel or CSV file, read it into a pandas DataFrame and convert it to a string
-        logging.info(f"Excel/CSV File Detected...Extracting Data.... {file_path}")
+        logging.info(f"Excel/CSV File Detected...Extracting Text.... %s", file_path)
         if file_path.endswith(".xlsx"):
-            # If the file is an Excel file, extract its metadata
             info = get_excel_metadata(file_path)
             sheets_data = read_excel_sheets(file_path)
-
         else:
-            # For CSV files, we can directly read the file into a pandas DataFrame
-            # and set the metadata to an empty dictionary.
             info = {}
             sheets_data = {"sheet1": pd.read_csv(file_path)}
 
-        text = ""
-        for sheet_name, sheet_df in sheets_data.items():
-            text += f"\n----- New Table: {sheet_name} -----\n"
-            # Convert the DataFrame to a dictionary and then to a string
-            text += str(sheet_df.to_dict()) + "\n"
+        text = "\n".join([f"\n----- New Table: {sheet_name} -----\n{sheet_df.to_dict()}" 
+                          for sheet_name, sheet_df in sheets_data.items()])
     else:
-        logging.warning(f"Unsupported file type: {file_path}")
-        raise Exception(f"Unsupported file type: {file_path}")
-    return info, text.strip(), file_path
+        logging.warning("Unsupported file type: %s", file_path)
+        raise ValueError("Unsupported file type: %s" % file_path)
 
+    return info, text.strip(), file_path
 
 def process_pdf(pdf_path):
     """
@@ -421,13 +390,17 @@ def write_extracted_text_to_file_anthropic(
     Write extracted text to a file in a specific format.
 
     Args:
-    - EXTRACTED_TEXT_FILE_NAME (str): The name of the output file.
-    - df (pandas.DataFrame): A DataFrame containing information about the extracted text.
-    - intro_text (str): The text to be written at the beginning of the output file.
-    - extracted_text (list): A list of strings, where each string is the extracted text from a document.
-    - outro_text (str): The text to be written at the end of the output file.
+        EXTRACTED_TEXT_FILE_NAME (str): The name of the output file.
+        df (pandas.DataFrame): The DataFrame containing file names.
+        intro_text (str): The introductory text to be written at the beginning of the file.
+        extracted_text (list): The list of extracted text to be written.
+        outro_text (str): The text that introduces the question to the output file.
+
+    Returns:
+        None
     """
-    with open(EXTRACTED_TEXT_FILE_NAME, "w") as f:
+
+    with open(EXTRACTED_TEXT_FILE_NAME, "w", encoding="utf-8") as f:
         # Write the introductory text to the output file
         f.write(intro_text + "\n")
         # Write each document's text to the output file
